@@ -1,0 +1,21 @@
+5-20
+步骤1：
+./ngram-count -text test.txt -order 3 -write count.txt
+步骤2：
+ ./ngram-count -text test.txt -lm test.lm
+
+5-21：
+欧洲议会平行语料库训练案例（europarl-v7.bg-en.en语料库）：
+步骤一：
+生成n-gram计数文件
+./ngram-count -text europarl-v7.bg-en.en -order 3 -write europarl.en.count
+步骤二：
+从计数文件训练语言模型：
+./ngram-count -read europarl.en.count -order 3 -lm europarl.en.lm -interpolate -kndiscount
+步骤三:
+利用上一步生成的语言模型计算测试集的困惑度：
+./ngram -ppl newtest.en -order 3 -lm europarl.en.lm > out1.ppl
+另外选择一个语料库资源（europarl-v7.ro-en.en语料库作为测试样本）测试和训练样本的比例一般在9：1，且需要在同样的背景和同样场景以及同样的环境下才有参考意义。
+out1.ppl文件输出结果：
+file newtest.en: 399329 sentences, 9710439 words, 1464 OOVs
+0 zeroprobs, logprob= -1.73841e+07 ppl= 52.45471 ppl1= 61.73324（ppl<100表明结果比较理想）
