@@ -1,0 +1,32 @@
+import codecs, sys
+import random
+
+Number=1549141
+Testnumber=154914
+f = codecs.open('/home/guijiyang/language-model-data/test-text/text.txt', 'r', encoding="utf8")          # 指定总的数据量
+target1 = codecs.open('/home/guijiyang/language-model-data/test-text/ptrain.txt', 'w', encoding="utf8")  # 指定要写入保存的训练样本
+target2 = codecs.open('/home/guijiyang/language-model-data/test-text/ptest.txt', 'w', encoding="utf8")   # 指定要写入保存的测试样本数
+select_list=random.sample(range(1,Number),Testnumber)  #首先从从训练样本总数中抽取随机样本的数并生成list的表
+line = f.readline()
+n=1
+trainn=0
+testnn=0
+while n<=Number:
+    if n in select_list:                  #然后遍历文件行数在select_list表中，随机函数在selcet_list表中这write进test.txt样本中
+        target2.writelines(line)
+        testnn=testnn+1
+
+    else:                                 #否则write进train.txt样本中取
+        target1.writelines(line)
+        trainn=trainn+1
+
+    line = f.readline()
+    n=n+1
+
+print (select_list)
+print ("训练样本数:%d" % trainn)
+print ("测试样本数:%d" % testnn)
+f.close()
+target1.close()
+target2.close()
+exit()
