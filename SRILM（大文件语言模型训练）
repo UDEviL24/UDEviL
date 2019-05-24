@@ -1,0 +1,5 @@
+步骤一：
+split -l 750000 ptrain.txt Bptrainbatch/ #  即每750000行数据为一个新文本存到Bptrainbatch目录(必须要事先创建好)下。
+步骤二：
+./make-batch-counts filepath.txt 1 cat ./counts -order 3 # 要用 /home/guijiyang/kaldi-trunk/tools/srilm/utils/src 
+                                                           里面的make-batch-counts脚本放在一个文件夹
