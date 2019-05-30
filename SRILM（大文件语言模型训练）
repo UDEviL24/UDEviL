@@ -1,5 +1,27 @@
 步骤一：
 split -l 750000 ptrain.txt Bptrainbatch/ #  即每750000行数据为一个新文本存到Bptrainbatch目录(必须要事先创建好)下。
+
 步骤二：
-./make-batch-counts filepath.txt 1 cat ./counts -order 3 # 要用 /home/guijiyang/kaldi-trunk/tools/srilm/utils/src 
-                                                           里面的make-batch-counts脚本放在一个文件夹
+ ls $(echo $PWD)/* > filepath.txt #要在分隔的文件夹下
+./make-batch-counts filepath.txt 1 cat ./counts -order 3 # 要用 /home/guijiyang/kaldi-trunk/tools/srilm/utils/src 里面的make-batch-counts脚本放在一个文件夹，其中filepath.txt为切分文件的全路径，可以用命令实现：ls $(echo $PWD)/* > filepath.txt，将统计的词频结果存放在counts目录下
+
+步骤三：
+
+若发现某个模块 not found可以通过下列两种方式解决：
+1.直接在模块前贴上其路径
+merger=/home/guijiyang/kaldi-trunk/tools/srilm/lm/bin/i686-m64/ngram-merge
+2.首先在文件前申明地址path的路径 后面在加引用 不要忘记加 "$" 取地址
+ngram_mergepath='/home/guijiyang/kaldi-trunk/tools/srilm/lm/bin/i686-m64/ngram-merge'
+merger=$ngram_mergepath
+./merge-batch-counts ./counts 合并counts文本并压缩
+
+步骤四：
+设置好make-big-lm文件夹中所需模块的路径仿造步骤三的问题（注意语法!!!）
+利用make-big-lm脚本训练大数据量的语言模型
+./make-big-lm -read ngrams.gz -lm bgt.lm -order 3
+
+步骤五：
+测试语言模型的ppl
+./ngram -ppl ptest.txt -order 3 -lm bgt.lm > out.ppl
+
+
