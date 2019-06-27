@@ -1,0 +1,162 @@
+# 是启动脚本时携带的参数个数
+-ne 是不等于
+这个语句的意思是“如果shell的启动参数不等于1个”
+
+$# 表示提供到shell脚本或者函数的参数总数；
+$1 表示第一个参数。
+
+
+timit 数据资源
+https://pan.baidu.com/s/1qYkDora
+TIMIT数据下载
+https://goo.gl/l0sPwz
+
+yesno运行说明
+https://blog.csdn.net/u011930705/article/details/81737937
+
+TIMIT数据解说
+https://blog.csdn.net/QFire/article/details/78711673
+
+timit run.sh说明及运行说明
+https://blog.csdn.net/wujianhaoren123/article/details/51276203
+https://blog.csdn.net/danyhgc/article/details/75222517
+http://www.360doc.com/content/15/0101/10/13208159_437288476.shtml
+
+在run.sh中 SGMM2 Training & Decoding下面有exit 0，你把这一行注释掉就可以了。 他要运行DNN了，希望你有CUDA
+
+timit 只跑到tri3,下面贴出tr3及其前面的tr2，tr1，单音素等的识别错误率，效果貌似还不错。
+输入以下代码来看一下部分结果：
+https://blog.csdn.net/shmilyforyq/article/details/75258259
+
+
+export PATH={/home/guijiyang/kaldi-trunk/tools/openfst-1.6.7/bin/}
+
+export PATH=$PATH:/home/guijiyang/kaldi-trunk/tools/openfst-1.6.7/bin
+export PATH=$PATH:/usr/bin
+fstprint L.fst   整数 4列
+fstprint --isymbols=phones.txt --osymbols=words.txt L.fst 音素 4列
+fstdraw L.fst | dot  
+输出 
+0 -> 0	 [fontsize=14,
+		label="46:46",
+		lp="72.235,879.5",
+		pos="e,78.809,43.246 65.661,43.246 -19.71,332.66 -17.519,872 72.235,872 160.98,872 164.12,344.71 81.652,53.091"];
+fstdraw --isymbols=phones.txt --osymbols=words.txt L.fst
+0 -> 0 [label = "aa:aa", fontsize = 14];
+	0 -> 0 [label = "ae:ae", fontsize = 14];
+	0 -> 0 [label = "ah:ah", fontsize = 14];
+
+
+fstdraw  --isymbols=words.txt --osymbols=words.txt <G.fst | dot -Tjpg > G.jpg
+fstprint G.fst 5列数字 49	15	34	34	4.80146551
+fstprint --isymbols=words.txt --osymbols=words.txt G.fst 输出 49 9 r r	3.82634377
+
+dot添加环境变量
+export PATH=$PATH:/usr/bin
+fstdraw <L.fst | dot
+
+在linux下加环境变量或者是把某个目录加到环境变量
+https://www.cnblogs.com/yupeter007/p/7267428.html
+
+kaldi数据准备过程
+https://blog.csdn.net/llearner/article/details/77549273
+
+Kaldi单音素GMM学习笔记
+https://blog.csdn.net/u010731824/article/details/69668765
+
+单因素训练train_mono.sh
+https://www.jianshu.com/p/18c42a09f056
+
+
+语音识别——kaldi HMM-GMM全部训练脚本分解
+https://blog.csdn.net/chinatelecom08/article/details/81875547
+
+语音识别（五）——Mel-Frequency Analysis, FBank, 语音识别的评价指标, 声学模型进阶
+https://blog.csdn.net/antkillerfarm/article/details/82585371
+
+语言模型12345
+https://blog.csdn.net/xmdxcsj/article/category/5981983
+
+irstlm
+https://www.cnblogs.com/hitnoah/p/3942717.html
+http://www.52nlp.cn/language-modeling-toolkit-irstlm-installation-and-trial-noting
+http://www.bubuko.com/infodetail-329757.html
+
+在语料的前后加上标志符
+~/kaldi-trunk/tools/irstlm/bin/add-start-end.sh < ~/kaldi-trunk/tools/all.txt > news-all2.txt
+
+设置环境变量
+export IRSTLM=/home/guijiyang/kaldi-trunk/tools/irstlm/
+
+运行
+~/kaldi-trunk/tools/irstlm/scripts/build-lm.sh -i ~/kaldi-trunk/tools/news-all2.txt -t ./tmp -n 2 -o train2.lm.gz
+
+使用srilm训练语言模型
+./ngram-count -text /home/guijiyang/language-model-data/data1/train/all.train -order 3 -lm /home/guijiyang/language-model-data/data1/model/all-order3.lm -interpolate -kndiscount
+
+./ngram-count -text /home/guijiyang/language-model-data/data1/train/all.train -order 2 -lm /home/guijiyang/language-model-data/data1/model/all-order2.lm -interpolate -kndiscount
+
+./ngram-count -text /home/guijiyang/language-model-data/data1/train/edu.train -order 2 -lm edu-order2.lm -interpolate -kndiscount
+
+#-interpolate为插值平滑，-kndiscount为 modified　Kneser-Ney 打折法，这两个是联合使用的
+
+计算ppl
+./ngram -ppl /home/guijiyang/language-model-data/data1/test/all.test -lm /home/guijiyang/language-model-data/data1/model/all-order2.lm > /home/guijiyang/language-model-data/data1/model/all-order2.ppl
+
+./ngram -ppl /home/guijiyang/language-model-data/data1/test/all.test -lm /home/guijiyang/language-model-data/data1/model/all-order2.lm -debug 2 > /home/guijiyang/language-model-data/data1/model/all-order2-debug2.ppl
+
+./ngram -ppl /home/guijiyang/language-model-data/data1/test/all.test -lm /home/guijiyang/language-model-data/data1/model/all-order3.lm > /home/guijiyang/language-model-data/data1/model/all-order3.ppl
+
+./ngram -ppl /home/guijiyang/language-model-data/data1/test/all.test -lm /home/guijiyang/language-model-data/data1/model/all-order3.lm -debug 2 > /home/guijiyang/language-model-data/data1/model/all-order3-debug2.ppl
+
+./ngram -ppl /home/guijiyang/language-model-data/data1/test/all.test -lm /home/guijiyang/language-model-data/data1/model/all-order4.lm > /home/guijiyang/language-model-data/data1/model/all-order4.ppl
+
+./ngram -ppl /home/guijiyang/language-model-data/data1/test/all.test -lm /home/guijiyang/language-model-data/data1/model/all-order4.lm -debug 2 > /home/guijiyang/language-model-data/data1/model/all-order4-debug2.ppl
+
+
+./ngram -ppl /home/guijiyang/kaldi-trunk/tools/srilm/lm/bin/i686-m64/sport.test -lm sport-order2.lm >　sport-order2.ppl
+
+./ngram -ppl /home/guijiyang/kaldi-trunk/tools/srilm/lm/bin/i686-m64/edu.test -lm edu.en.lm -debug 2 >　edu2.en.lm.ppl
+
+
+合并文件
+cat /home/guijiyang/language-model-data/data1/train/tech.train /home/guijiyang/language-model-data/data1/train/stock.train /home/guijiyang/language-model-data/data1/train/sport.train /home/guijiyang/language-model-data/data1/train/society.train /home/guijiyang/language-model-data/data1/train/public.train /home/guijiyang/language-model-data/data1/train/lottery.train /home/guijiyang/language-model-data/data1/train/home.train /home/guijiyang/language-model-data/data1/train/game.train /home/guijiyang/language-model-data/data1/train/finance.train /home/guijiyang/language-model-data/data1/train/fashion.train /home/guijiyang/language-model-data/data1/train/estate.train /home/guijiyang/language-model-data/data1/train/entertainment.train /home/guijiyang/language-model-data/data1/train/edu.train /home/guijiyang/language-model-data/data1/train/constellation.train > /home/guijiyang/language-model-data/data1/train/all
+
+
+cat /home/guijiyang/language-model-data/data1/test/tech.test /home/guijiyang/language-model-data/data1/test/stock.test /home/guijiyang/language-model-data/data1/test/sport.test /home/guijiyang/language-model-data/data1/test/society.test /home/guijiyang/language-model-data/data1/test/public.test /home/guijiyang/language-model-data/data1/test/lottery.test /home/guijiyang/language-model-data/data1/test/home.test /home/guijiyang/language-model-data/data1/test/game.test /home/guijiyang/language-model-data/data1/test/finance.test /home/guijiyang/language-model-data/data1/test/fashion.test /home/guijiyang/language-model-data/data1/test/estate.test /home/guijiyang/language-model-data/data1/test/entertainment.test /home/guijiyang/language-model-data/data1/test/edu.test /home/guijiyang/language-model-data/data1/test/constellation.test > /home/guijiyang/language-model-data/data1/test/all
+
+srilm训练语言模型
+https://www.cnblogs.com/welen/p/7593222.html
+
+语言模型srilm（一） 基本用法
+https://blog.csdn.net/xmdxcsj/article/details/50353689
+
+SRILM使用之ngram-count
+https://blog.csdn.net/GavinLiu1990/article/details/81363936
+较为常用的使用方法如下：
+    最简单(Good-Turing折扣算法)：ngram-count -text train -lm LM.ARPA
+    输出词典和计数文件：ngram-count -text train -write-vocab VOCAB -write COUNT -lm LM.ARPA
+    对语言模型剪枝：ngram-count -text train -prune 0.2 -lm LM.ARPA
+    设置计数最小阈值：ngram-count -text train -gt1min 1 -gt2min 1 -gt3min 2 -lm LM.ARPA
+    使用经过插值的修正Kneser-Ney折扣算法：ngram-count -text train -kndiscount -interpolate -lm LM.ARPA
+    将debug信息输出来：ngram-count -text train -kndiscount -interpolate -lm LM.ARPA -debug 1 2>DEBUG
+
+语言模型合并
+./compute-best-mix lambda="0.93,0.07" /home/guijiyang/language-model-data/data1/model/all-order3-debug2.ppl /home/guijiyang/language-model-data/data1/model/all-order4-debug2.ppl
+
+./compute-best-mix lambda="0.8,0.1,0.1" /home/guijiyang/language-model-data/data1/model/all-order3-debug2.ppl /home/guijiyang/language-model-data/data1/model/all-order4-debug2.ppl /home/guijiyang/language-model-data/data1/model/all-order2-debug2.ppl
+
+
+
+./ngram -lm /home/guijiyang/language-model-data/data1/model/all-order3.lm -mix-lm /home/guijiyang/language-model-data/data1/model/all-order4.lm -lambda 0.937 -write-lm /home/guijiyang/language-model-data/data1/model/all-mergelm34.lm
+
+./ngram -lm /home/guijiyang/language-model-data/data1/model/sport-order3.lm -mix-lm /home/guijiyang/language-model-data/data1/model/sport-order4.lm -mix-lm2 /home/guijiyang/language-model-data/data1/model/sport-order2.lm -lambda 0.900723 -mix-lambda2 0.0701241 -write-lm /home/guijiyang/language-model-data/data1/model/sport-mergelm234.lm
+
+计算ppl
+./ngram -ppl /home/guijiyang/language-model-data/data1/test/all.test -lm /home/guijiyang/language-model-data/data1/model/all-mergelm34.lm > /home/guijiyang/language-model-data/data1/model/all-mergelm34.ppl
+
+./ngram -ppl /home/guijiyang/language-model-data/data1/test/sport.test -lm /home/guijiyang/language-model-data/data1/model/sport-mergelm234.lm > /home/guijiyang/language-model-data/data1/model/sport-mergelm234.ppl
+
+
+
+
